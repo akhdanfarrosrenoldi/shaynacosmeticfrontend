@@ -1,4 +1,81 @@
+import { useEffect, useState } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Category, Cosmetic } from "../types/type";
+import apiClient from "../services/apiServices";
+
+const fetchCategories = async () => {
+  const response = await apiClient.get("/categories");
+  return response.data.data;
+};
+const fetchPopularCosmetics = async () => {
+  const response = await apiClient.get("/cosmetics?limit=4&is_popular=1");
+  return response.data.data;
+};
+const fetchAllCosmetics = async () => {
+  const response = await apiClient.get("/cosmetics?limit=4");
+  return response.data.data;
+};
+
 export default function BrowsePage() {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [popularCosmetics, setPopularCosmetics] = useState<Cosmetic[]>([]);
+  const [allCosmetics, setAllCosmetics] = useState<Cosmetic[]>([]);
+
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [loadingPopularCosmetics, setLoadingPopularCosmetics] = useState(true);
+  const [loadingAllCosmetics, setLoadingAllCosmetics] = useState(true);
+
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchCategoriesData = async () => {
+      try {
+        const categoriesData = await fetchCategories();
+        setCategories(categoriesData);
+      } catch {
+        setError("Failed to load categories");
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    const fetchPopularCosmeticsData = async () => {
+      try {
+        const popularCosmeticsData = await fetchPopularCosmetics();
+        setPopularCosmetics(popularCosmeticsData);
+      } catch {
+        setError("Failed to load services");
+      } finally {
+        setLoadingPopularCosmetics(false);
+      }
+    };
+
+    const fetchCosmeticsData = async () => {
+      try {
+        const cosmeticsData = await fetchAllCosmetics();
+        setAllCosmetics(cosmeticsData);
+      } catch {
+        setError("Failed to load cosmetics");
+      } finally {
+        setLoadingAllCosmetics(false);
+      }
+    };
+
+    fetchCategoriesData();
+    fetchCosmeticsData();
+    fetchPopularCosmeticsData();
+  }, []);
+
+  if (loadingCategories && loadingAllCosmetics && loadingPopularCosmetics) {
+    return <p>Loading categories and cosmetics...</p>;
+  }
+
+  if (error) {
+    return <p>Error loading data: {error}</p>;
+  }
+
+  const BASE_URL = import.meta.env.VITE_REACT_API_STORAGE_URL;
+
   return (
     <main className="mx-auto flex min-h-screen max-w-[640px] flex-col gap-5 bg-white pb-[141px]">
       <section id="Info">
@@ -73,8 +150,15 @@ export default function BrowsePage() {
       </section>
       <section id="Hero">
         <div id="HeroSlider" className="swiper w-full overflow-x-hidden">
-          <div className="swiper-wrapper">
-            <div className="swiper-slide !w-fit">
+          <Swiper
+            className="swiper-wrapper"
+            direction="horizontal"
+            spaceBetween={16}
+            slidesPerView="auto"
+            slidesOffsetAfter={20}
+            slidesOffsetBefore={20}
+          >
+            <SwiperSlide className="swiper-slide !w-fit">
               <a href="">
                 <div className="flex h-[190px] w-[320px] items-center justify-center overflow-hidden rounded-3xl">
                   <img
@@ -84,8 +168,8 @@ export default function BrowsePage() {
                   />
                 </div>
               </a>
-            </div>
-            <div className="swiper-slide !w-fit">
+            </SwiperSlide>
+            <SwiperSlide className="swiper-slide !w-fit">
               <a href="">
                 <div className="flex h-[190px] w-[320px] items-center justify-center overflow-hidden rounded-3xl">
                   <img
@@ -95,8 +179,8 @@ export default function BrowsePage() {
                   />
                 </div>
               </a>
-            </div>
-            <div className="swiper-slide !w-fit">
+            </SwiperSlide>
+            <SwiperSlide className="swiper-slide !w-fit">
               <a href="">
                 <div className="flex h-[190px] w-[320px] items-center justify-center overflow-hidden rounded-3xl">
                   <img
@@ -106,109 +190,14 @@ export default function BrowsePage() {
                   />
                 </div>
               </a>
-            </div>
-          </div>
+            </SwiperSlide>
+          </Swiper>
         </div>
       </section>
       <section id="TopCategories">
         <div className="flex flex-col gap-4 px-5">
           <h2 className="font-bold">Top Categories</h2>
           <div className="categories-cards grid grid-cols-3 gap-4">
-            <a href="category.html">
-              <div className="flex h-[142px] items-center justify-center rounded-3xl bg-cosmetics-greylight p-px transition-all duration-300 hover:bg-cosmetics-gradient-purple-pink hover:p-[2px]">
-                <div className="flex h-full w-full flex-col justify-center rounded-[23px] bg-white px-[10px] hover:rounded-[22px]">
-                  <div className="mx-auto mb-[10px] flex size-[60px] items-center justify-center overflow-hidden rounded-full">
-                    <img
-                      src="assets/images/thumbnails/serum.png"
-                      alt="image"
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <h3 className="mb-[2px] text-center text-sm font-semibold leading-[21px]">
-                    Serum
-                  </h3>
-                  <p className="text-center text-sm leading-[21px] text-cosmetics-grey">
-                    18,398
-                  </p>
-                </div>
-              </div>
-            </a>
-            <a href="category.html">
-              <div className="flex h-[142px] items-center justify-center rounded-3xl bg-cosmetics-greylight p-px transition-all duration-300 hover:bg-cosmetics-gradient-purple-pink hover:p-[2px]">
-                <div className="flex h-full w-full flex-col justify-center rounded-[23px] bg-white px-[10px] hover:rounded-[22px]">
-                  <div className="mx-auto mb-[10px] flex size-[60px] items-center justify-center overflow-hidden rounded-full">
-                    <img
-                      src="assets/images/thumbnails/mascaras.png"
-                      alt="image"
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <h3 className="mb-[2px] text-center text-sm font-semibold leading-[21px]">
-                    Mascaras
-                  </h3>
-                  <p className="text-center text-sm leading-[21px] text-cosmetics-grey">
-                    18,398
-                  </p>
-                </div>
-              </div>
-            </a>
-            <a href="category.html">
-              <div className="flex h-[142px] items-center justify-center rounded-3xl bg-cosmetics-greylight p-px transition-all duration-300 hover:bg-cosmetics-gradient-purple-pink hover:p-[2px]">
-                <div className="flex h-full w-full flex-col justify-center rounded-[23px] bg-white px-[10px] hover:rounded-[22px]">
-                  <div className="mx-auto mb-[10px] flex size-[60px] items-center justify-center overflow-hidden rounded-full">
-                    <img
-                      src="assets/images/thumbnails/lipsticks.png"
-                      alt="image"
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <h3 className="mb-[2px] text-center text-sm font-semibold leading-[21px]">
-                    Lipsticks
-                  </h3>
-                  <p className="text-center text-sm leading-[21px] text-cosmetics-grey">
-                    18,398
-                  </p>
-                </div>
-              </div>
-            </a>
-            <a href="category.html">
-              <div className="flex h-[142px] items-center justify-center rounded-3xl bg-cosmetics-greylight p-px transition-all duration-300 hover:bg-cosmetics-gradient-purple-pink hover:p-[2px]">
-                <div className="flex h-full w-full flex-col justify-center rounded-[23px] bg-white px-[10px] hover:rounded-[22px]">
-                  <div className="mx-auto mb-[10px] flex size-[60px] items-center justify-center overflow-hidden rounded-full">
-                    <img
-                      src="assets/images/thumbnails/brushes.png"
-                      alt="image"
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <h3 className="mb-[2px] text-center text-sm font-semibold leading-[21px]">
-                    Brushes
-                  </h3>
-                  <p className="text-center text-sm leading-[21px] text-cosmetics-grey">
-                    18,398
-                  </p>
-                </div>
-              </div>
-            </a>
-            <a href="category.html">
-              <div className="flex h-[142px] items-center justify-center rounded-3xl bg-cosmetics-greylight p-px transition-all duration-300 hover:bg-cosmetics-gradient-purple-pink hover:p-[2px]">
-                <div className="flex h-full w-full flex-col justify-center rounded-[23px] bg-white px-[10px] hover:rounded-[22px]">
-                  <div className="mx-auto mb-[10px] flex size-[60px] items-center justify-center overflow-hidden rounded-full">
-                    <img
-                      src="assets/images/thumbnails/face-mask.png"
-                      alt="image"
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <h3 className="mb-[2px] text-center text-sm font-semibold leading-[21px]">
-                    Face Mask
-                  </h3>
-                  <p className="text-center text-sm leading-[21px] text-cosmetics-grey">
-                    18,398
-                  </p>
-                </div>
-              </div>
-            </a>
             <a href="category.html">
               <div className="flex h-[142px] items-center justify-center rounded-3xl bg-cosmetics-greylight p-px transition-all duration-300 hover:bg-cosmetics-gradient-purple-pink hover:p-[2px]">
                 <div className="flex h-full w-full flex-col justify-center rounded-[23px] bg-white px-[10px] hover:rounded-[22px]">
@@ -238,8 +227,15 @@ export default function BrowsePage() {
             id="PopularChoicesSlider"
             className="swiper w-full overflow-x-hidden"
           >
-            <div className="swiper-wrapper">
-              <div className="swiper-slide !w-fit">
+            <Swiper
+              className="swiper-wrapper"
+              direction="horizontal"
+              spaceBetween={14}
+              slidesPerView="auto"
+              slidesOffsetAfter={20}
+              slidesOffsetBefore={20}
+            >
+              <SwiperSlide className="swiper-slide !w-fit">
                 <a href="details.html">
                   <div className="relative flex h-[276px] w-[222px] items-center justify-center rounded-3xl transition-all duration-300 hover:bg-cosmetics-gradient-purple-pink hover:p-[2px]">
                     <div className="flex h-full flex-col justify-center gap-4 rounded-[23px] bg-white px-4 hover:rounded-[22px]">
@@ -274,8 +270,8 @@ export default function BrowsePage() {
                     </div>
                   </div>
                 </a>
-              </div>
-              <div className="swiper-slide !w-fit">
+              </SwiperSlide>
+              <SwiperSlide className="swiper-slide !w-fit">
                 <a href="details.html">
                   <div className="relative flex h-[276px] w-[222px] items-center justify-center rounded-3xl transition-all duration-300 hover:bg-cosmetics-gradient-purple-pink hover:p-[2px]">
                     <div className="flex h-full flex-col justify-center gap-4 rounded-[23px] bg-white px-4 hover:rounded-[22px]">
@@ -310,8 +306,8 @@ export default function BrowsePage() {
                     </div>
                   </div>
                 </a>
-              </div>
-              <div className="swiper-slide !w-fit">
+              </SwiperSlide>
+              <SwiperSlide className="swiper-slide !w-fit">
                 <a href="details.html">
                   <div className="relative flex h-[276px] w-[222px] items-center justify-center rounded-3xl transition-all duration-300 hover:bg-cosmetics-gradient-purple-pink hover:p-[2px]">
                     <div className="flex h-full flex-col justify-center gap-4 rounded-[23px] bg-white px-4 hover:rounded-[22px]">
@@ -346,8 +342,8 @@ export default function BrowsePage() {
                     </div>
                   </div>
                 </a>
-              </div>
-              <div className="swiper-slide !w-fit">
+              </SwiperSlide>
+              <SwiperSlide className="swiper-slide !w-fit">
                 <a href="details.html">
                   <div className="relative flex h-[276px] w-[220px] items-center justify-center rounded-3xl transition-all duration-300 hover:bg-cosmetics-gradient-purple-pink hover:p-[2px]">
                     <div className="flex h-full flex-col justify-center gap-4 rounded-[23px] bg-white px-4 hover:rounded-[22px]">
@@ -382,8 +378,8 @@ export default function BrowsePage() {
                     </div>
                   </div>
                 </a>
-              </div>
-            </div>
+              </SwiperSlide>
+            </Swiper>
           </div>
         </div>
       </section>
