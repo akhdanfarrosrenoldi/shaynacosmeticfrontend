@@ -27,7 +27,7 @@ export default function CategoryPage() {
     return <p>Loading...</p>;
   }
   if (error) {
-    return <p>Error Loading:</p>;
+    return <p>Error Loading: {error}</p>;
   }
   if (!category) {
     return <p>Category not Found</p>;
@@ -66,7 +66,7 @@ export default function CategoryPage() {
                 You deserve beauty life
               </p>
             </div>
-            <a href="my-cart.html">
+            <Link to={`/cart`}>
               <div className="flex size-[44px] shrink-0 items-center justify-center rounded-full border border-cosmetics-greylight">
                 <img
                   src="/assets/images/icons/cart.svg"
@@ -74,7 +74,7 @@ export default function CategoryPage() {
                   className="size-5 shrink-0"
                 />
               </div>
-            </a>
+            </Link>
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -161,7 +161,7 @@ export default function CategoryPage() {
         <div className="flex flex-col gap-4 px-5">
           {category.cosmetics.length > 0 ? (
             category.cosmetics.map((cosmetic) => (
-              <a href="details.html" key={cosmetic.id}>
+              <Link to={`/cosmetic/${cosmetic.slug}`} key={cosmetic.id}>
                 <div className="flex h-[130px] items-center justify-center rounded-3xl transition-all duration-300 hover:bg-cosmetics-gradient-purple-pink">
                   <div className="flex h-full w-full hover:h-[calc(100%_-_4px)] hover:w-[calc(100%_-_4px)] transtion-all duration-300 gap-4 rounded-[23px] hover:rounded-[22px] items-center bg-white px-4">
                     <div className="flex size-[90px] shrink-0 items-center justify-center">
@@ -196,7 +196,7 @@ export default function CategoryPage() {
                     </div>
                   </div>
                 </div>
-              </a>
+              </Link>
             ))
           ) : (
             <p>Tidak ada Category</p>
